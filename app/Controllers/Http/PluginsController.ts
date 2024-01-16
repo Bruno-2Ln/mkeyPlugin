@@ -8,7 +8,9 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
 export default class PluginsController {
   public async listOfPlugins() {
-    const plugins = await Database.from(Plugin.table)
+    const plugins = await Database
+      .from(Plugin.table)
+      .orderBy('updated_at', 'desc')
     return {
       plugins,
     }

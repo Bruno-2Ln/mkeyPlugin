@@ -25,4 +25,5 @@ export default class Plugin extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
+
 }
