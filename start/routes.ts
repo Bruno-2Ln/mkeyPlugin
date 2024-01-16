@@ -24,6 +24,7 @@ import HealthCheck from '@ioc:Adonis/Core/HealthCheck'
 Route.get('/plugins', 'PluginsController.listOfPlugins')
 Route.get('/plugins/:slug', 'PluginsController.pluginDetailsBySlug')
 Route.post('/plugins', 'PluginsController.createPlugin')
+Route.patch('/plugins/:slug', 'PluginsController.patchPluginBySlug')
 
 Route.get('health', async ({ response }) => {
   const report = await HealthCheck.getReport()

@@ -36,6 +36,28 @@ export default class PluginsController {
     }
   }
 
+  public async patchPluginBySlug({ request, params }) {
+    const { name, version, description } = request.all()
+    const plugin = await Plugin.findByOrFail('slug', params.slug)
+    const pluginFile = request.file('file', {
+      extnames: ['zip'],
+    })!
+    await pluginFile.moveToDisk('./')
+
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    const download_url = pluginFile.fileName
+
+    let payload: any = { version, download_url }
+    name?.length ? (payload = { ...payload, name }) : ''
+    description?.length ? (payload = { ...payload, description }) : ''
+
+    await plugin.merge({ ...payload }).save()
+
+    return {
+      plugin,
+    }
+  }
+
   public async pluginDetailsBySlug({ params }: HttpContextContract) {
     // const message = 'Plugin not found'
     // const status = 404
