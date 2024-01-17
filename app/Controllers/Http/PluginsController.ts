@@ -2,34 +2,32 @@
 import Database from '@ioc:Adonis/Lucid/Database'
 import Plugin from 'App/Models/Plugin'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-// import { schema } from '@ioc:Adonis/Core/Validator'
+import CreatePlugin from 'App/Validators/CreatePluginValidator'
+import UpdatePlugin from 'App/Validators/UpdatePluginValidator'
 // import { cuid } from '@ioc:Adonis/Core/Helpers'
 // import RowNotFoundException from 'App/Exceptions/RowNotFoundException'
 
 export default class PluginsController {
   public async listOfPlugins() {
-    const plugins = await Database
-      .from(Plugin.table)
-      .orderBy('updated_at', 'desc')
+    const plugins = await Database.from(Plugin.table).orderBy('updated_at', 'desc')
     return {
       plugins,
     }
   }
 
   public async createPlugin({ request }: HttpContextContract) {
-    const payload = request.all()
-
     const pluginFile = request.file('file', {
       extnames: ['zip'],
     })!
     await pluginFile.moveToDisk('./')
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const download_url = pluginFile.fileName
-
     const plugin = new Plugin()
+    const data = await request.validate(CreatePlugin)
+
     await plugin
       .merge({
-        ...payload,
+        ...data,
         download_url,
       })
       .save()
@@ -39,21 +37,16 @@ export default class PluginsController {
   }
 
   public async patchPluginBySlug({ request, params }) {
-    const { name, version, description } = request.all()
+    // const payload = request.all()
     const plugin = await Plugin.findByOrFail('slug', params.slug)
     const pluginFile = request.file('file', {
       extnames: ['zip'],
     })!
     await pluginFile.moveToDisk('./')
-
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    const download_url = pluginFile.fileName
-
-    let payload: any = { version, download_url }
-    name?.length ? (payload = { ...payload, name }) : ''
-    description?.length ? (payload = { ...payload, description }) : ''
-
-    await plugin.merge({ ...payload }).save()
+    const download_url = `${pluginFile.fileName}`
+    const data = await request.validate(UpdatePlugin)
+    await plugin.merge({ ...data, download_url }).save()
 
     return {
       plugin,

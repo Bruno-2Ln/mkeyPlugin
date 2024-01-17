@@ -6,7 +6,7 @@ export default class Plugin extends BaseModel {
   public id: number
 
   @column()
-  public name: string
+  public name: string | null | undefined
 
   @column()
   public slug: string
@@ -15,10 +15,10 @@ export default class Plugin extends BaseModel {
   public version: string
 
   @column()
-  public description: string
+  public description: string | null | undefined
 
   @column()
-  public download_url: string
+  public download_url: string | null | undefined
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
