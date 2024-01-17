@@ -1,11 +1,8 @@
-// import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Database from '@ioc:Adonis/Lucid/Database'
 import Plugin from 'App/Models/Plugin'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import CreatePlugin from 'App/Validators/CreatePluginValidator'
 import UpdatePlugin from 'App/Validators/UpdatePluginValidator'
-// import { cuid } from '@ioc:Adonis/Core/Helpers'
-// import RowNotFoundException from 'App/Exceptions/RowNotFoundException'
 
 export default class PluginsController {
   public async listOfPlugins() {
@@ -37,7 +34,6 @@ export default class PluginsController {
   }
 
   public async patchPluginBySlug({ request, params }) {
-    // const payload = request.all()
     const plugin = await Plugin.findByOrFail('slug', params.slug)
     const pluginFile = request.file('file', {
       extnames: ['zip'],
