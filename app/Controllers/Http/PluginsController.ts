@@ -13,12 +13,18 @@ export default class PluginsController {
   }
 
   public async createPlugin({ request }: HttpContextContract) {
+    const { slug, version } = request.body()
     const pluginFile = request.file('file', {
       extnames: ['zip'],
     })!
-    await pluginFile.moveToDisk('./')
+    const options = {
+      name: `${slug}-${version}.zip`,
+      visibility: 'public',
+      ContentType: 'application/zip',
+    }
+    await pluginFile.moveToDisk(slug, options, 's3')
     // eslint-disable-next-line @typescript-eslint/naming-convention
-    const download_url = pluginFile.fileName
+    const download_url = `${slug}/${slug}-${version}.zip`
     const plugin = new Plugin()
     const data = await request.validate(CreatePlugin)
 
@@ -30,15 +36,22 @@ export default class PluginsController {
       .save()
     return {
       plugin,
+      pluginFile,
     }
   }
 
   public async patchPluginBySlug({ request, params }) {
+    const { version } = request.body()
     const plugin = await Plugin.findByOrFail('slug', params.slug)
     const pluginFile = request.file('file', {
       extnames: ['zip'],
     })!
-    await pluginFile.moveToDisk('./')
+    const options = {
+      name: `${plugin.slug}-${version}.zip`,
+      visibility: 'public',
+      ContentType: 'application/zip',
+    }
+    await pluginFile.moveToDisk(plugin.slug, options, 's3')
     // eslint-disable-next-line @typescript-eslint/naming-convention
     const download_url = `${pluginFile.fileName}`
     const data = await request.validate(UpdatePlugin)
